@@ -1,0 +1,4 @@
+# 运行时依赖：mock 模式零依赖（纯标准库）
+# 接真实模型时（可选）：
+# openai>=1.30
+# langgraph>=0.2   # 生产版编排：StateGraph + Send API

@@ -1,0 +1,19 @@
+﻿======================================================================
+闂: 涓婁釜鏈堟€婚攢鍞鏄灏?
+python.exe : Traceback (most recent call last):
+所在位置 行:445 字符: 76
++ ... ata-agent"; & "D:\Anaconda\python.exe" -X utf8 "$ws\main.py" 2>&1 | O ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last) 
+   ::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "C:\Users\24940\WorkBuddy\2026-09-25-17-01-48\repos\zhiqi-data-agent\mai
+n.py", line 28, in <module>
+    main()
+  File "C:\Users\24940\WorkBuddy\2026-09-25-17-01-48\repos\zhiqi-data-agent\mai
+n.py", line 18, in main
+    out, trace = run_graph(q)
+                 ^^^^^^^^^
+NameError: name 'run_graph' is not defined
+EXIT:1
