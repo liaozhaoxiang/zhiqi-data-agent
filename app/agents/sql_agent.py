@@ -61,6 +61,7 @@ def _mock_sql(question):
 
 def run(question, max_retry=2):
     """返回 {sql, cols, rows, attempts}。带 schema 修正重试循环。"""
+    from .. import audit
     attempts = []
     sql = None
     resp = llm.chat([{"role": "system", "content": _SCHEMA_PROMPT},
@@ -68,10 +69,12 @@ def run(question, max_retry=2):
     sql = resp if resp else _mock_sql(question)
     for i in range(max_retry + 1):
         attempts.append(sql)
+        audit.log("sql", "sql_generate", sql, extra={"attempt": i + 1})
         try:
             cols, rows = db.run_sql(sql)
             return {"sql": sql, "cols": cols, "rows": rows, "attempts": attempts}
         except Exception as e:  # 带错误信息走一轮 schema 修正
+            audit.log("sql", "sql_retry", str(e)[:120], status="error", extra={"attempt": i + 1})
             if i == max_retry:
                 raise
             fix = llm.chat([

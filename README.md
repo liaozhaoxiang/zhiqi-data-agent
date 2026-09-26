@@ -5,6 +5,7 @@
 1. **上下文物隔离**：子 Agent 各自持有独立上下文，主管只消费结构化摘要（`AgentResult.summary`）。
 2. **模型异构**：`app/llm.py` 的适配层按 agent 角色路由到不同模型档位（mock 模式下统一走确定性模板，接真实 API 时按 `MODEL_PLAN` 分流——SQL 走代码模型、归因走推理模型、报告走中档模型）。
 3. **权限隔离**：SQL Agent 只能拿到 SQLite 只读连接（`mode=ro`），且 SQL 校验层只放行单条 `SELECT`；分析/报告 Agent 拿不到任何 DB 句柄。
+4. **Agent 级审计日志**：`app/audit.py` 以 JSONL 按 agent 分域打点（router 路由决策 / sql 生成与重试 / db-gate 执行与**拒绝** / analysis 并行分发 / supervisor 任务起止），被校验层拒绝的 SQL 同样留痕（status=denied），权限违规可回溯。
 
 ## 架构
 

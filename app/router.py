@@ -11,13 +11,17 @@ SIMPLE_PAT = re.compile(r"^(上个月|本月|最近)?(的)?\s*(总销售额|销�
 
 
 def classify(question):
-    """返回 'simple' | 'complex'。"""
+    """返回 'simple' | 'complex'。路由决策落审计日志（可回溯为什么走了哪条通道）。"""
+    from . import audit
     q = question.strip()
     if SIMPLE_PAT.match(q) and "为什么" not in q and "为什么" not in q:
+        audit.log("router", "route_decision", question, extra={"decision": "simple"})
         return "simple"
     complex_signals = ["为什么", "归因", "原因", "下滑", "增长", "对比", "和.*关系", "影响"]
     if any(re.search(p, q) for p in complex_signals):
+        audit.log("router", "route_decision", question, extra={"decision": "complex"})
         return "complex"
+    audit.log("router", "route_decision", question, extra={"decision": "simple"})
     return "simple"
 
 

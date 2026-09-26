@@ -8,7 +8,9 @@ class AnalysisState(dict):
 
 def run(question):
     """复杂问题的多 agent 编排主入口。返回 (report, state)。"""
+    from .. import audit
     st = AnalysisState(question=question, traces=[])
+    audit.log("supervisor", "task_start", question)
     # 1) 主查询：拿到主指标序列
     main = sql_agent.run(question)
     st["traces"].append({"agent": "sql", "sql": main["sql"], "n_rows": len(main["rows"])})
@@ -19,4 +21,6 @@ def run(question):
     sql_trace = "\n".join("sql: %s (%d rows)" % (t["sql"], t["n_rows"]) for t in st["traces"] if "sql" in t)
     report = report_agent.run(question, ana["summary"], sql_trace)
     st["traces"].append({"agent": "report", "done": True})
+    audit.log("supervisor", "task_done", "report generated",
+              extra={"n_agents": 3 + len(ana.get("attribution", {}).get("supporting", {}))})
     return report, st

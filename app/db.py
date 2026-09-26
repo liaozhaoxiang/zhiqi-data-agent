@@ -8,6 +8,7 @@ import os
 import random
 import re
 import sqlite3
+import time
 
 from . import config
 
@@ -75,14 +76,19 @@ def validate_sql(sql):
 
 
 def run_sql(sql, path=None):
+    from . import audit
     ok, reason = validate_sql(sql)
     if not ok:
+        audit.log("db-gate", "sql_rejected", sql, status="denied", extra={"reason": reason})
         raise PermissionError("SQL 校验失败: %s | sql=%s" % (reason, sql))
     conn = get_readonly_conn(path)
     try:
+        t0 = time.time()
         cur = conn.execute(sql)
         cols = [d[0] for d in cur.description]
         rows = cur.fetchall()
+        audit.log("db-gate", "sql_executed", sql, latency_ms=(time.time() - t0) * 1000,
+                  extra={"n_rows": len(rows)})
         return cols, rows
     finally:
         conn.close()

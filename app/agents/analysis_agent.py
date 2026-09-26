@@ -30,11 +30,13 @@ def _mock_attribution(question, series):
 
 def _parallel_subqueries(subquestions):
     """Map-Reduce：子问题并行分发（生产环境对应 LangGraph Send API）。"""
+    from .. import audit
     results = {}
     threads = []
 
     def worker(key, q):
         results[key] = sql_agent.run(q)
+        audit.log("analysis", "parallel_send", q, extra={"subtask": key})
 
     for k, q in subquestions.items():
         t = threading.Thread(target=worker, args=(k, q))

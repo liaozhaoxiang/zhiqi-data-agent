@@ -1,6 +1,7 @@
 """CLI 入口：python main.py "问题"  （不带参数则跑内置演示）"""
 import sys
 
+from app import audit
 from app.graph import graph as run_graph
 
 DEMOS = [
@@ -22,6 +23,10 @@ def main():
         print("-" * 70)
         print(out)
         print()
+    print("=" * 70)
+    print("[审计日志] 最近 %d 条（logs/audit.jsonl，按 agent 分域）：" % min(8, len(audit.read_tail(8))))
+    for rec in audit.read_tail(8):
+        print("  ", rec)
 
 
 if __name__ == "__main__":
