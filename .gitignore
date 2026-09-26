@@ -3,3 +3,4 @@ __pycache__/
 data/*.db
 logs/
 .DS_Store
+smoke*.txt
